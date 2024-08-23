@@ -1,17 +1,7 @@
-documentationUrl: hhttps://docs.airbyte.com/integrations/sources/pokeapi
+documentationUrl: hhttps://docs.airbyte.com/integrations/sources/app-store-connect
 connectionSpecification:
-  # $schema: http://json-schema.org/draft-07/schema#
-  # title: App Store Connect Spec
-  # type: object
-  # required:
-  #   - TODO
-  # properties:
-  #   # 'TODO: This schema defines the configuration required for the source. This usually involves metadata such as database and/or authentication information.':
-  #   TODO:
-  #     type: string
-  #     description: describe me
   $schema: http://json-schema.org/draft-07/schema#
-  title: Pokeapi Spec
+  title: App Store Connect Spec
   type: object
   required:
     - auth_key_id
@@ -22,8 +12,8 @@ connectionSpecification:
       type: integer
       description: Max items returned per request
       default: 200
-      min: 1
-      max: 200
+      minimum: 1
+      maximum: 200
     auth_key_id:
       type: string
     auth_issuer_id:

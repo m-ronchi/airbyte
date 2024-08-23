@@ -3,7 +3,46 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": [ "string" ]
+      "type": "string",
+      "description": "The opaque resource ID that uniquely identifies the resource."
+    },
+    "bundleId": {
+      "type": "string",
+      "description": "The bundle ID for your app. This ID must match the one you use in Xcode. The bundle ID cannot be changed after you upload your first build."
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of your app as it will appear in the App Store. The maximum length is 30 characters."
+    },
+    "primaryLocale": {
+      "type": "string",
+      "description": "The primary locale for your app. If localized app information isn’t available in an App Store territory, the information from your primary language is used instead."
+    },
+    "sku": {
+      "type": "string",
+      "description": "A unique ID for your app that is not visible on the App Store."
+    },
+    "contentRightsDeclaration": {
+      "type": "string",
+      "description": "Possible Values: DOES_NOT_USE_THIRD_PARTY_CONTENT, USES_THIRD_PARTY_CONTENT"
+    },
+    "isOrEverWasMadeForKids": {
+      "type": "boolean"
+    },
+    "subscriptionStatusUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "subscriptionStatusUrlForSandbox": {
+      "type": "string",
+      "format": "uri"
+    },
+    "subscriptionStatusUrlVersion": {
+      "type": "string"
+    },
+    "subscriptionStatusUrlVersionForSandbox": {
+      "type": "string"
     }
-  }
+  },
+  "required": [ "id" ]
 }

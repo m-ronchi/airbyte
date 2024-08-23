@@ -3,14 +3,35 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": ["null", "string"]
+      "type": "string",
+      "description": "The opaque resource ID that uniquely identifies the CustomerReviews resource."
     },
-    "name": {
-      "type": ["null", "string"]
+    "body": {
+      "type": "string",
+      "description": "The review text that the customer wrote."
     },
-    "signup_date": {
-      "type": ["null", "string"],
-      "format": "date-time"
+    "createdDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date and time the customer created the review."
+    },
+    "rating": {
+      "type": "integer",
+      "description": "The rating the customer provided.",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "reviewerNickname": {
+      "type": "string",
+      "description": "The customer’s nickname used in the review."
+    },
+    "title": {
+      "type": "string",
+      "description": "The title that the customer wrote for the review."
+    },
+    "territory": {
+      "type": "string",
+      "description": "The App Store territory."
     }
   }
 }
