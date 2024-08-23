@@ -7,7 +7,7 @@ from typing import Any, List, Mapping, Optional, Tuple
 import jwt
 from airbyte_cdk import AbstractSource, Stream, AbstractHeaderAuthenticator
 from airbyte_protocol.models import SyncMode, AirbyteMessage
-from .streams import CustomerReviews
+from .streams import Apps, CustomerReviews
 
 
 @dataclass
@@ -67,4 +67,10 @@ class SourceAppStoreConnect(AbstractSource):
             key_id=config["auth_key_id"],
             issuer_id=config["auth_issuer_id"],
             private_key=config["auth_private_key"])
-        return [CustomerReviews(app_id=config["app_id"], limit=config["limit"], authenticator=auth)]
+        apps = Apps(limit=config["limit"], authenticator=auth)
+        customer_reviews = CustomerReviews(
+            parent=apps,
+            limit=config["limit"],
+            authenticator=auth
+        )
+        return [apps, customer_reviews]

@@ -35,9 +35,47 @@ class FullRefreshTest(TestCase):
     @HttpMocker()
     def test_read_a_single_page(self, http_mocker: HttpMocker) -> None:
 
+        http_mocker.get(HttpRequest(
+            url="https://api.appstoreconnect.apple.com/v1/apps?limit=1"), HttpResponse(body="""{
+  "data": [
+    {
+      "type": "apps",
+      "id": "10746822401",
+      "attributes": {
+        "name": "Your Next Cortado",
+        "bundleId": "com.bdt.ync",
+        "sku": "YNC",
+        "primaryLocale": "en-US",
+        "isOrEverWasMadeForKids": false,
+        "subscriptionStatusUrl": null,
+        "subscriptionStatusUrlVersion": null,
+        "subscriptionStatusUrlForSandbox": null,
+        "subscriptionStatusUrlVersionForSandbox": null,
+        "contentRightsDeclaration": "DOES_NOT_USE_THIRD_PARTY_CONTENT",
+        "streamlinedBuyEnabled": false
+      },
+      "relationships": {
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/apps/10746822401"
+      }
+    }
+  ],
+  "links": {
+    "self": "https://api.appstoreconnect.apple.com/v1/apps?limit=2",
+    "next": "https://api.appstoreconnect.apple.com/v1/apps?cursor=AoJ4g7mg6o4DKzEwNzQ2ODIxOTc2.ANrJC88&limit=2"
+  },
+  "meta": {
+    "paging": {
+      "total": 431,
+      "limit": 2
+    }
+  }
+}""", status_code=200))
+
         http_mocker.get(
             HttpRequest(
-                url="https://api.appstoreconnect.apple.com/v1/apps/682658836/customerReviews?limit=1&sort=createdDate"),
+                url="https://api.appstoreconnect.apple.com/v1/apps/10746822401/customerReviews?limit=1&sort=createdDate"),
             HttpResponse(body="""{
   "data": [
     {
@@ -65,7 +103,7 @@ class FullRefreshTest(TestCase):
     }
   ],
   "links": {
-    "self": "https://api.appstoreconnect.apple.com/v1/apps/682658836/customerReviews?limit=1"
+    "self": "https://api.appstoreconnect.apple.com/v1/apps/10746822401/customerReviews?limit=1"
   },
   "meta": {
     "paging": {
@@ -83,9 +121,47 @@ class FullRefreshTest(TestCase):
 
     @HttpMocker()
     def test_read_multiple_pages(self, http_mocker: HttpMocker) -> None:
+
+        http_mocker.get(HttpRequest(
+            url="https://api.appstoreconnect.apple.com/v1/apps?limit=1"), HttpResponse(body="""{
+  "data": [
+    {
+      "type": "apps",
+      "id": "10746822401",
+      "attributes": {
+        "name": "Your Next Cortado",
+        "bundleId": "com.bdt.ync",
+        "sku": "YNC",
+        "primaryLocale": "en-US",
+        "isOrEverWasMadeForKids": false,
+        "subscriptionStatusUrl": null,
+        "subscriptionStatusUrlVersion": null,
+        "subscriptionStatusUrlForSandbox": null,
+        "subscriptionStatusUrlVersionForSandbox": null,
+        "contentRightsDeclaration": "DOES_NOT_USE_THIRD_PARTY_CONTENT",
+        "streamlinedBuyEnabled": false
+      },
+      "relationships": {
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/apps/10746822401"
+      }
+    }
+  ],
+  "links": {
+    "self": "https://api.appstoreconnect.apple.com/v1/apps?limit=2",
+    "next": "https://api.appstoreconnect.apple.com/v1/apps?cursor=AoJ4g7mg6o4DKzEwNzQ2ODIxOTc2.ANrJC88&limit=2"
+  },
+  "meta": {
+    "paging": {
+      "total": 431,
+      "limit": 2
+    }
+  }
+}""", status_code=200))
         http_mocker.get(
             HttpRequest(
-                url="https://api.appstoreconnect.apple.com/v1/apps/682658836/customerReviews?limit=1&sort=createdDate"),
+                url="https://api.appstoreconnect.apple.com/v1/apps/10746822401/customerReviews?limit=1&sort=createdDate"),
             HttpResponse(body="""{
   "data": [
     {
@@ -113,8 +189,8 @@ class FullRefreshTest(TestCase):
     }
   ],
   "links": {
-    "self": "https://api.appstoreconnect.apple.com/v1/apps/682658836/customerReviews?limit=1",
-    "next": "https://api.appstoreconnect.apple.com/v1/apps/682658836/customerReviews?cursor=AQ.AMt2C-U&limit=1"
+    "self": "https://api.appstoreconnect.apple.com/v1/apps/10746822401/customerReviews?limit=1",
+    "next": "https://api.appstoreconnect.apple.com/v1/apps/10746822401/customerReviews?cursor=AQ.AMt2C-U&limit=1"
   },
   "meta": {
     "paging": {
@@ -126,7 +202,7 @@ class FullRefreshTest(TestCase):
         )
         http_mocker.get(
             HttpRequest(
-                url="https://api.appstoreconnect.apple.com/v1/apps/682658836/customerReviews?cursor=AQ.AMt2C-U&limit=1"),
+                url="https://api.appstoreconnect.apple.com/v1/apps/10746822401/customerReviews?cursor=AQ.AMt2C-U&limit=1"),
             HttpResponse(body="""{
   "data": [
     {
@@ -154,7 +230,7 @@ class FullRefreshTest(TestCase):
     }
   ],
   "links": {
-    "self": "https://api.appstoreconnect.apple.com/v1/apps/682658836/customerReviews?limit=1"
+    "self": "https://api.appstoreconnect.apple.com/v1/apps/10746822401/customerReviews?limit=1"
   },
   "meta": {
     "paging": {

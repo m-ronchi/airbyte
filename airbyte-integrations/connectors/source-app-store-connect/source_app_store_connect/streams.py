@@ -1,7 +1,8 @@
+import json
 import requests
-from airbyte_cdk import AirbyteTracedException, AvailabilityStrategy, HttpStream, SyncMode
+from airbyte_cdk import AirbyteMessage, AirbyteTracedException, AvailabilityStrategy, HttpStream, HttpSubStream, Record, StreamSlice, SyncMode
 from airbyte_cdk.sources.streams.call_rate import APIBudget
-from airbyte_protocol.models import FailureType
+from airbyte_protocol.models import FailureType, Type as MessageType
 from requests.auth import AuthBase
 from abc import ABC
 from typing import Any, Iterable, List, Mapping, MutableMapping, Optional
@@ -10,10 +11,11 @@ from urllib.parse import parse_qs, urlparse
 
 class AppStoreConnectStream(HttpStream, ABC):
 
-    def __init__(self, app_id: str, limit: int, authenticator: AuthBase | None = None, api_budget: APIBudget | None = None):
+    extra_query_args: Mapping[str, str] = {}
+
+    def __init__(self, limit: int, authenticator: AuthBase | None = None, api_budget: APIBudget | None = None):
         super().__init__(authenticator, api_budget)
 
-        self.app_id = app_id
         self.limit = limit
 
     @property
@@ -21,9 +23,6 @@ class AppStoreConnectStream(HttpStream, ABC):
 
     @property
     def primary_key(self): return "id"
-
-    def stream_slices(self, *, sync_mode: SyncMode, cursor_field: List[str] | None = None, stream_state: Mapping[str, Any] | None = None) -> Iterable[Mapping[str, Any] | None]:
-        return super().stream_slices(sync_mode=sync_mode, cursor_field=cursor_field, stream_state=stream_state)
 
     def next_page_token(self, response: requests.Response) -> Optional[Mapping[str, Any]]:
         links = response.json().get("links", {})
@@ -38,7 +37,7 @@ class AppStoreConnectStream(HttpStream, ABC):
         if next_page_token:
             return parse_qs(urlparse(next_page_token["next_url"]).query)
         else:
-            return {"limit": self.limit, "sort": "createdDate"}
+            return {"limit": self.limit, **self.extra_query_args}
 
     @property
     def availability_strategy(self) -> Optional[AvailabilityStrategy]:
@@ -51,12 +50,46 @@ class AppStoreConnectStream(HttpStream, ABC):
             raise AirbyteTracedException(
                 message=external_message, internal_message=internal_message, failure_type=FailureType.config_error
             )
-        yield from response.json().get("data", [])
+        for record in response.json().get("data", []):
+            yield {"id": record["id"], **record["attributes"]}
+
+
+class Apps(AppStoreConnectStream):
+    def path(self, *, stream_state=None, stream_slice=None, next_page_token=None) -> str:
+        return "apps"
+
+    @property
+    def use_cache(self) -> bool:
+        return True
 
 
 class CustomerReviews(AppStoreConnectStream):
 
+    extra_query_args = {"sort": "createdDate"}
+
+    def __init__(self, limit: int, parent: Apps, authenticator: AuthBase | None = None, api_budget: APIBudget | None = None):
+        super().__init__(limit, authenticator, api_budget)
+
+        self.parent = parent
+
     def path(
         self, *, stream_state=None, stream_slice=None, next_page_token=None
     ) -> str:
-        return f"apps/{self.app_id}/customerReviews"
+        assert stream_slice
+        return f"apps/{stream_slice['id']}/customerReviews"
+
+    def stream_slices(self, *, sync_mode, cursor_field=None, stream_state=None) -> Iterable[Mapping[str, Any] | None]:
+        # read_stateless() assumes the parent is not concurrent. This is currently okay since the concurrent CDK does
+        # not support either substreams or RFR, but something that needs to be considered once we do
+        for parent_record in self.parent.read_only_records(stream_state):
+            # Skip non-records (eg AirbyteLogMessage)
+            if isinstance(parent_record, AirbyteMessage):
+                if parent_record.type == MessageType.RECORD:
+                    assert parent_record.record
+                    parent_record = parent_record.record.data
+                else:
+                    continue
+            elif isinstance(parent_record, Record):
+                parent_record = parent_record.data
+
+            yield StreamSlice(partition=parent_record, cursor_slice={})

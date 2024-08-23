@@ -14,21 +14,16 @@ connectionSpecification:
   title: Pokeapi Spec
   type: object
   required:
-    - app_id
     - auth_key_id
     - auth_issuer_id
     - auth_private_key
   properties:
-    app_id:
-      type: string
-      description: App ID
-      pattern: ^[a-z0-9_\-]+$
-      examples:
-        - "682658836"
     limit:
       type: integer
       description: Max items returned per request
       default: 200
+      min: 1
+      max: 200
     auth_key_id:
       type: string
     auth_issuer_id:
