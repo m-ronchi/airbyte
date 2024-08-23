@@ -15,8 +15,8 @@ repository = "https://github.com/airbytehq/airbyte"
 packages = [{ include = "source_app_store_connect" }, { include = "main.py" }]
 
 [tool.poetry.dependencies]
-python = "^3.10,<3.12"
-airbyte-cdk = "^4"
+python = "^3.9,<3.12"
+airbyte-cdk = "*"
 
 [tool.poetry.scripts]
 source-app-store-connect = "source_app_store_connect.run:run"

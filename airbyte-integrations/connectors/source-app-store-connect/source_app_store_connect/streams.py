@@ -13,7 +13,7 @@ class AppStoreConnectStream(HttpStream, ABC):
 
     extra_query_args: Mapping[str, str] = {}
 
-    def __init__(self, limit: int, authenticator: AuthBase | None = None, api_budget: APIBudget | None = None):
+    def __init__(self, limit: int, authenticator: Optional[AuthBase] = None, api_budget: Optional[APIBudget] = None):
         super().__init__(authenticator, api_budget)
 
         self.limit = limit
@@ -67,7 +67,7 @@ class CustomerReviews(AppStoreConnectStream):
 
     extra_query_args = {"sort": "createdDate"}
 
-    def __init__(self, limit: int, parent: Apps, authenticator: AuthBase | None = None, api_budget: APIBudget | None = None):
+    def __init__(self, limit: int, parent: Apps, authenticator: Optional[AuthBase] = None, api_budget: Optional[APIBudget] = None):
         super().__init__(limit, authenticator, api_budget)
 
         self.parent = parent
@@ -78,7 +78,7 @@ class CustomerReviews(AppStoreConnectStream):
         assert stream_slice
         return f"apps/{stream_slice['id']}/customerReviews"
 
-    def stream_slices(self, *, sync_mode, cursor_field=None, stream_state=None) -> Iterable[Mapping[str, Any] | None]:
+    def stream_slices(self, *, sync_mode, cursor_field=None, stream_state=None) -> Iterable[Mapping[str, Any]]:
         # read_stateless() assumes the parent is not concurrent. This is currently okay since the concurrent CDK does
         # not support either substreams or RFR, but something that needs to be considered once we do
         for parent_record in self.parent.read_only_records(stream_state):
