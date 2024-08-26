@@ -32,6 +32,10 @@
     "territory": {
       "type": "string",
       "description": "The App Store territory."
+    },
+    "app_id": {
+      "type": "string",
+      "description": "ID of the parent App"
     }
   }
 }
