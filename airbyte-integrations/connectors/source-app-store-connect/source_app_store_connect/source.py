@@ -66,7 +66,7 @@ class SourceAppStoreConnect(AbstractSource):
         auth = JwtAuthenticator(
             key_id=config["auth_key_id"],
             issuer_id=config["auth_issuer_id"],
-            private_key=config["auth_private_key"])
+            private_key=str(config["auth_private_key"]).replace("\\n", "\n"))
         apps = Apps(limit=config["limit"], authenticator=auth)
         customer_reviews = CustomerReviews(
             parent=apps,
