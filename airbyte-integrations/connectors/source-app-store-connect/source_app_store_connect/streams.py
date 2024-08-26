@@ -43,7 +43,7 @@ class AppStoreConnectStream(HttpStream, ABC):
     def availability_strategy(self) -> Optional[AvailabilityStrategy]:
         return None
 
-    def parse_response(self, response: requests.Response, **kwargs) -> Iterable[Mapping]:
+    def parse_response(self, response: requests.Response, *, stream_slice=None, **kwargs) -> Iterable[Mapping]:
         if response.status_code in (401, 403):
             internal_message = f"Unauthorized credentials. Response: {response.json()}"
             external_message = "Can not get metadata with unauthorized credentials. Try to re-authenticate in source settings."
@@ -51,7 +51,10 @@ class AppStoreConnectStream(HttpStream, ABC):
                 message=external_message, internal_message=internal_message, failure_type=FailureType.config_error
             )
         for record in response.json().get("data", []):
-            yield {"id": record["id"], **record["attributes"]}
+            parent = {
+                "app_id": stream_slice.get("id")
+            } if stream_slice else {}
+            yield {"id": record["id"], **record["attributes"], **parent}
 
 
 class Apps(AppStoreConnectStream):
